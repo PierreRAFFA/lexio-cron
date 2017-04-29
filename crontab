@@ -1,0 +1,1 @@
+*/1 * * * * /usr/local/bin/node /app/jobs/updateRanking.js >> /var/log/cron.log 2>&1

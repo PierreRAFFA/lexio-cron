@@ -1,0 +1,21 @@
+{
+  "name": "wordz-cron",
+  "version": "0.0.1",
+  "description": "Wordz Cron",
+  "main": "start-cron.sh",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:PierreRAFFA/wordz-cron.git"
+  },
+  "dependencies": {
+    "assert": "^1.4.1",
+    "lodash": "^4.17.4",
+    "mongodb": "^2.2.26"
+  },
+  "author": "Pierre RAFFA",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/PierreRAFFA/wordz-cron/issues"
+  },
+  "homepage": "https://github.com/PierreRAFFA/wordz-cron"
+}
