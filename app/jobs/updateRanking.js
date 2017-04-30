@@ -1,16 +1,15 @@
 #!/usr/bin/env node
 
-var MongoClient = require('mongodb').MongoClient;
-var assert = require('assert');
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
 
 // Connection URL
-var url = require('../config')(process.env.NODE_ENV);
-console.log(url);
+const url = require('../config')(process.env.NODE_ENV);
 
 MongoClient.connect(url, (err, db) => {
   assert.equal(null, err);
 
-  var userCollection = db.collection('user');
+  const userCollection = db.collection('user');
 
   userCollection.find({}, {"sort": [["statistics.en_GB.highestRankingScore", "desc"]]}).toArray((err, users) => {
     assert.equal(err, null);

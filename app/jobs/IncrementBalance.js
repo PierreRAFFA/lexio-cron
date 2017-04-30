@@ -5,7 +5,6 @@ const assert = require('assert');
 
 // Connection URL
 const url = require('../config')(process.env.NODE_ENV);
-console.log(url);
 
 MongoClient.connect(url, (err, db) => {
   assert.equal(null, err);
