@@ -1,0 +1,5 @@
+# Every minute
+*/1 * * * * NODE_ENV=production /usr/local/bin/node /app/jobs/updateRanking.js >> /var/log/cron.log 2>&1
+
+# Every hour
+0 * * * * NODE_ENV=production /usr/local/bin/node /app/jobs/incrementBalance.js >> /var/log/cron.log 2>&1
