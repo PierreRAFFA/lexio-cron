@@ -11,7 +11,7 @@ MongoClient.connect(url, (err, db) => {
 
   const userCollection = db.collection('user');
 
-  userCollection.find({"balance": { "$lt": 15 }}).toArray((err, users) => {
+  userCollection.find({"balance": { "$lt": 5 }}).toArray((err, users) => {
     assert.equal(err, null);
 
     console.dir(users);
