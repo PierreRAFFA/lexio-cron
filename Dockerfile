@@ -4,7 +4,7 @@ FROM node:boron
 VOLUME /var/log/
 
 #Define Workspace
-WORKDIR /var/www/wordz-cron/
+WORKDIR /var/www/wordz-cron
 
 #RUN apt-get -y install rsyslog
 RUN apt-get update
