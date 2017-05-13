@@ -1,11 +1,14 @@
 #!/usr/bin/env node
-
+console.log('incrementBalance');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
 // Connection URL
-const url = require('../config')(process.env.NODE_ENV);
 
+const url = require('../config')(process.env.NODE_ENV);
+console.log('===================');
+console.log(url);
+console.log('===================');
 MongoClient.connect(url, (err, db) => {
   assert.equal(null, err);
 

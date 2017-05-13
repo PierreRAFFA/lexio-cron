@@ -5,11 +5,11 @@
 module.exports = function(environment) {
   switch(environment) {
     case 'production':
-    case 'staging':
-      return 'mongodb://mongo:27017/wordz-api';
+    case 'development':
+      return 'mongodb://api:password@mongohost:27017/api';
       break;
 
     default:
-      return 'mongodb://localhost:27017/wordz-api-dev';
+      return 'mongodb://mongohost:27017/api';
   }
 };
