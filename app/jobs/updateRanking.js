@@ -8,6 +8,7 @@ const url = require('../config')(process.env.NODE_ENV);
 console.log('===================');
 console.log(url);
 console.log('===================');
+
 MongoClient.connect(url, (err, db) => {
   assert.equal(null, err);
 

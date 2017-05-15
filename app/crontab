@@ -1,5 +1,5 @@
 # Every minute
-*/1 * * * * NODE_ENV=production /usr/local/bin/node /var/app/app/jobs/updateRanking.js >> /var/log/cron.log 2>&1
+*/1 * * * * NODE_ENV={{NODE_ENV}} MONGO_API_PASSWORD={{MONGO_API_PASSWORD}} /usr/local/bin/node /var/app/app/jobs/updateRanking.js >> /var/log/cron.log 2>&1
 
 # Every hour
-0 * * * * NODE_ENV=production /usr/local/bin/node /var/app/app/jobs/incrementBalance.js >> /var/log/cron.log 2>&1
+0 * * * * NODE_ENV={{NODE_ENV}} MONGO_API_PASSWORD={{MONGO_API_PASSWORD}} /usr/local/bin/node /var/app/app/jobs/incrementBalance.js >> /var/log/cron.log 2>&1

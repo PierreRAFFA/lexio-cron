@@ -6,7 +6,7 @@ module.exports = function(environment) {
   switch(environment) {
     case 'production':
     case 'development':
-      return 'mongodb://api:password@mongohost:27017/api';
+      return 'mongodb://api:{0}@mongohost:27017/api'.replace('{0}', process.env.MONGO_API_PASSWORD);
       break;
 
     default:
