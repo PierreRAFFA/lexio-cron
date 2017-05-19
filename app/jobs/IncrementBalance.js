@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 console.log('incrementBalance');
+console.log(process.env.NODE_ENV);
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
