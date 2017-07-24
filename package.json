@@ -9,7 +9,9 @@
   },
   "dependencies": {
     "assert": "^1.4.1",
-    "mongodb": "^2.2.26"
+    "lodash": "^4.17.4",
+    "mongodb": "^2.2.26",
+    "request": "^2.81.0"
   },
   "author": "Pierre RAFFA",
   "license": "Apache 2.0",
