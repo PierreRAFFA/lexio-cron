@@ -6,10 +6,10 @@ module.exports = function(environment) {
   switch(environment) {
     case 'production':
     case 'development':
-      return 'mongodb://api:{0}@mongohost:27017/api'.replace('{0}', process.env.MONGO_API_PASSWORD);
+      return 'mongodb://api:{0}@mongohost:27017/authentication'.replace('{0}', process.env.MONGO_API_PASSWORD);
       break;
 
     default:
-      return 'mongodb://mongohost:27017/api';
+      return 'mongodb://mongohost:27017/authentication';
   }
 };
