@@ -7,7 +7,11 @@ const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 const request = require('request');
 const map = require('lodash/map');
+const filter = require('lodash/filter');
 const pull = require('lodash/pull');
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+const MAX_BALANCE = 5;
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 loginAsAdmin()
@@ -56,19 +60,23 @@ function incrementBalance(jwt) {
 
     const userCollection = db.collection('user');
 
-    userCollection.find({ "balance": { "$lt": 100 } }).toArray((err, users) => {
+    //get users with balance less than MAX_BALANCE
+    userCollection.find({ "balance": { "$lt": MAX_BALANCE } }).toArray((err, users) => {
       assert.equal(err, null);
 
-      let ids = pull(
-        map(users, user => user.firebaseToken),
-        undefined,
-        null
-      );
-
+      //increment balance
       users.forEach(user => {
         user.balance += 1;
         userCollection.save(user);
       });
+
+      //get user list to notify
+      const usersWithMaxBalance = filter(users, user => user.balance === MAX_BALANCE);
+      let ids = pull(
+        map(usersWithMaxBalance, user => user.firebaseToken),
+        undefined,
+        null
+      );
 
       db.close();
 
