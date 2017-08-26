@@ -6,10 +6,16 @@ module.exports = function(environment) {
   switch(environment) {
     case 'production':
     case 'development':
-      return 'mongodb://api:{0}@mongohost:27017/authentication'.replace('{0}', process.env.MONGO_API_PASSWORD);
+      return {
+        authentication: 'mongodb://api:{0}@wordz-authentication-mongo:27017/authentication'.replace('{0}', process.env.MONGO_API_PASSWORD),
+        game: 'mongodb://api:{0}@wordz-game-mongo:27017/game'.replace('{0}', process.env.MONGO_API_PASSWORD)
+      };
       break;
 
     default:
-      return 'mongodb://mongohost:27017/authentication';
+      return {
+        authentication: 'mongodb://wordz-authentication-mongo:27017/authentication',
+        game: 'mongodb://wordz-game-mongo:27017/game',
+      }
   }
 };

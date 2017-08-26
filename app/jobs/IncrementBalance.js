@@ -11,9 +11,6 @@ const filter = require('lodash/filter');
 const pull = require('lodash/pull');
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-const MAX_BALANCE = 5;
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
 loginAsAdmin()
   .then(response => {
     return response.jwt;
@@ -50,7 +47,7 @@ function loginAsAdmin() {
 function incrementBalance(jwt) {
 
   // Connection URL
-  const url = require('../config')(process.env.NODE_ENV);
+  const url = require('../config')(process.env.NODE_ENV).authentication;
   console.log('===================');
   console.log(url);
   console.log('===================');
