@@ -25,7 +25,7 @@ RUN chmod +x /usr/bin/start-cron.sh
 RUN crontab /var/app/app/crontab #/etc/cron.d/crontab
 
 #Install dependencies
-RUN npm install
+RUN npm install --quiet
 
 #Launch
 RUN touch /var/log/cron.log

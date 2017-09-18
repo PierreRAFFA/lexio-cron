@@ -12,11 +12,11 @@ const indexOf = require('lodash/indexOf');
 const filter = require('lodash/filter');
 const head = require('lodash/head');
 const omit = require('lodash/omit');
+const get = require('lodash/get');
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-const MAX_BALANCE = 5;
 const LANGUAGES = ['en_GB', 'fr_FR'];
-const RANKING_DAY_DURATION = 14;
+const RANKING_DAY_DURATION = 8;  //next Monday(1) + 7
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 // Connection URL
@@ -45,15 +45,32 @@ startJob('en_GB')
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////// START
 function startJob(language) {
+  let currentRanking;
+  let startDate;
+  let endDate;
   return connectToDatabases()
     .then(() => {
-      return aggregateGames(language);
+      return getCurrentRanking();
+    })
+    .then(instance => {
+      currentRanking = instance;
+      if (!currentRanking) {
+        const newDates = createNewDates();
+        startDate = newDates.startDate;
+        endDate = newDates.endDate;
+      }else{
+        startDate = get(currentRanking, 'startDate');
+        endDate = get(currentRanking, 'endDate');
+      }
+    })
+    .then(() => {
+      return aggregateGames(language, startDate, endDate);
     })
     .then(aggregateGames => {
       return populateUserInAggregateGames(aggregateGames, language);
     })
-    .then(ranking => {
-      return saveRanking(ranking, language);
+    .then(rankingContent => {
+      return saveRanking(currentRanking, rankingContent, language);
     })
 }
 /////////////////////////////////////////////////////////////////
@@ -99,12 +116,17 @@ function connectToDatabase(url) {
 /**
  * Returns the sorted games by score with userId
  */
-function aggregateGames(language) {
+function aggregateGames(language, startDate, endDate) {
   const defer = Promise.defer();
 
   const gameCollection = gameDb.collection('game');
   gameCollection.aggregate([{
-    $match: { language: language }
+    $match: {
+      $and: [
+        { language: language },
+        { creationDate: { $gt: startDate, $lt: endDate } },
+      ]
+    }
   }, {
     $group: {
       _id: "$userId",
@@ -145,7 +167,6 @@ function populateUserInAggregateGames(aggregateGames, language) {
         aggregateGame.user = JSON.parse(JSON.stringify(
           omit(gameUser, [
             'password', 'accessToken', 'email', 'statistics', 'balance', 'firebaseToken',
-            'profile.id', 'profile.provider', 'profile.name', 'profile.gender', 'profile.emails', 'profile._raw', 'profile._json'
           ])
         ));
         updateUserRanking(gameUser, index + 1, language);
@@ -165,14 +186,27 @@ function populateUserInAggregateGames(aggregateGames, language) {
 function getUsers(userIds) {
   const defer = Promise.defer();
   const userCollection = authenticationDb.collection('user');
-  userCollection.find({ _id: { $in: map(userIds, id => new ObjectID(id)) }})
-  .toArray((err, users) => {
-    if(err) {
+
+  // db.user.aggregate([{$match: { $or: [{"_id": ObjectId("59a45abd5a483602c777df40")}, {_id:ObjectId("59a409d4d31674002598833a")}] }},{"$lookup": {"from":"userIdentity","localField":"_id","foreignField":"userId","as":"test"}}])
+  userCollection.aggregate([{
+    $match: {
+      $or: map(userIds, id => ({_id: new ObjectID(id)}))
+    }
+  }, {
+    $lookup: {
+      from: 'userIdentity',
+      localField: '_id',
+      foreignField: 'userId',
+      as: 'identities'
+    }
+  }], (err, users) => {
+    if (err) {
       defer.reject(err);
-    }else{
-      defer.resolve(users);
+    } else {
+      defer.resolve(map(users, user => omit(user, 'identities[0].credentials', 'identities[0].profile.id', 'identities[0].profile.emails', 'identities[0].profile._raw', 'identities[0].profile._json', 'identities[0].profile.name', 'identities[0].profile.displayName')));
     }
   });
+
   return defer.promise;
 }
 /////////////////////////////////////////////////////////////////
@@ -182,21 +216,21 @@ function getUsers(userIds) {
  * @param ranking
  * @returns {Promise.<TResult>}
  */
-function saveRanking(ranking) {
+function saveRanking(currentRanking, rankingContent, language) {
   const defer = Promise.defer();
 
-  return getCurrentRanking().then(currentRanking => {
-    console.log(currentRanking);
+  // return getCurrentRanking().then(currentRanking => {
+  //   console.log(currentRanking);
     const rankingCollection = gameDb.collection('ranking');
 
     //means no ranking saved yet or no ranking for the current date
     if(!currentRanking) {
       rankingCollection.insertOne({
-        ranking: ranking,
+        ranking: rankingContent,
         language: 'en_GB',
         startDate: new Date(),
         endDate: new Date(moment()
-          .day(8) //next Monday + 7
+          .day(RANKING_DAY_DURATION)
           .set('hour', 0)
           .set('minute', 0)
           .set('second', 0)
@@ -210,15 +244,15 @@ function saveRanking(ranking) {
         }
       });
     }else{
-      rankingCollection.updateOne({_id: currentRanking._id}, { $set: { ranking: ranking }}, (err, result) => {
+      rankingCollection.updateOne({_id: currentRanking._id}, { $set: { ranking: rankingContent }}, (err, result) => {
         if(err) {
           defer.reject(err);
         }else{
-          defer.resolve(ranking);
+          defer.resolve(rankingContent);
         }
       });
     }
-  });
+  // });
 
   return defer.promise;
 }
@@ -268,5 +302,18 @@ function updateUserRanking(user, ranking, language) {
 
     const userCollection = authenticationDb.collection('user');
     userCollection.save(user);
+  }
+}
+
+function createNewDates() {
+  return {
+    startDate: new Date(),
+    endDate: new Date(moment()
+    .day(RANKING_DAY_DURATION)
+    .set('hour', 0)
+    .set('minute', 0)
+    .set('second', 0)
+    .set('millisecond', 0)
+    .toISOString())
   }
 }
