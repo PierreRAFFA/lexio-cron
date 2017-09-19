@@ -185,28 +185,31 @@ function populateUserInAggregateGames(aggregateGames, language) {
  */
 function getUsers(userIds) {
   const defer = Promise.defer();
-  const userCollection = authenticationDb.collection('user');
 
-  // db.user.aggregate([{$match: { $or: [{"_id": ObjectId("59a45abd5a483602c777df40")}, {_id:ObjectId("59a409d4d31674002598833a")}] }},{"$lookup": {"from":"userIdentity","localField":"_id","foreignField":"userId","as":"test"}}])
-  userCollection.aggregate([{
-    $match: {
-      $or: map(userIds, id => ({_id: new ObjectID(id)}))
-    }
-  }, {
-    $lookup: {
-      from: 'userIdentity',
-      localField: '_id',
-      foreignField: 'userId',
-      as: 'identities'
-    }
-  }], (err, users) => {
-    if (err) {
-      defer.reject(err);
-    } else {
-      defer.resolve(map(users, user => omit(user, 'identities[0].credentials', 'identities[0].profile.id', 'identities[0].profile.emails', 'identities[0].profile._raw', 'identities[0].profile._json', 'identities[0].profile.name', 'identities[0].profile.displayName')));
-    }
-  });
-
+  if (!userIds || userIds.length === 0) {
+    defer.resolve([]);
+  } else {
+    // db.user.aggregate([{$match: { $or: [{"_id": ObjectId("59a45abd5a483602c777df40")}, {_id:ObjectId("59a409d4d31674002598833a")}] }},{"$lookup": {"from":"userIdentity","localField":"_id","foreignField":"userId","as":"test"}}])
+    const userCollection = authenticationDb.collection('user');
+    userCollection.aggregate([{
+      $match: {
+        $or: map(userIds, id => ({ _id: new ObjectID(id) }))
+      }
+    }, {
+      $lookup: {
+        from: 'userIdentity',
+        localField: '_id',
+        foreignField: 'userId',
+        as: 'identities'
+      }
+    }], (err, users) => {
+      if (err) {
+        defer.reject(err);
+      } else {
+        defer.resolve(map(users, user => omit(user, 'identities[0].credentials', 'identities[0].profile.id', 'identities[0].profile.emails', 'identities[0].profile._raw', 'identities[0].profile._json', 'identities[0].profile.name', 'identities[0].profile.displayName')));
+      }
+    });
+  }
   return defer.promise;
 }
 /////////////////////////////////////////////////////////////////
@@ -240,7 +243,7 @@ function saveRanking(currentRanking, rankingContent, language) {
         if(err) {
           defer.reject(err);
         }else{
-          defer.resolve(ranking);
+          defer.resolve(rankingContent);
         }
       });
     }else{
