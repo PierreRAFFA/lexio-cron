@@ -7,15 +7,15 @@ module.exports = function(environment) {
     case 'production':
     case 'development':
       return {
-        authentication: 'mongodb://api:{0}@wordz-authentication-mongo:27017/authentication'.replace('{0}', process.env.MONGO_API_PASSWORD),
-        game: 'mongodb://api:{0}@wordz-game-mongo:27017/game'.replace('{0}', process.env.MONGO_API_PASSWORD)
+        authentication: 'mongodb://api:{0}@lexio-authentication-mongo:27017/authentication'.replace('{0}', process.env.MONGO_API_PASSWORD),
+        game: 'mongodb://api:{0}@lexio-game-mongo:27017/game'.replace('{0}', process.env.MONGO_API_PASSWORD)
       };
       break;
 
     default:
       return {
-        authentication: 'mongodb://wordz-authentication-mongo:27017/authentication',
-        game: 'mongodb://wordz-game-mongo:27017/game',
+        authentication: 'mongodb://lexio-authentication-mongo:27017/authentication',
+        game: 'mongodb://lexio-game-mongo:27017/game',
       }
   }
 };

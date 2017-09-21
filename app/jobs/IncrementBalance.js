@@ -22,7 +22,12 @@ loginAsAdmin()
     return incrementBalance(jwt);
   })
   .then(result => {
+    console.log('Increment Balance Done !');
     console.log(result);
+  })
+  .catch(err => {
+    console.log('Increment Balance Error !');
+    console.error(err);
   });
 
 ///////////////////////////////////////////////////////////////////////////
@@ -30,8 +35,8 @@ loginAsAdmin()
 function loginAsAdmin() {
   return new Promise((resolve, reject) => {
     let options = {
-      url: `http://wordz-authentication:3010/api/users/login`,
-      form: {email: "admin@wordz.com", password: process.env.AUTHENTICATION_API_ADMIN_PASSWORD},
+      url: `http://lexio-authentication:3010/api/users/login`,
+      form: {email: "admin@lexiogame.com", password: process.env.AUTHENTICATION_API_ADMIN_PASSWORD},
     };
 
     request.post(options, (error, response, body) => {
@@ -96,7 +101,7 @@ function sendNotification(jwt, type, ids) {
   console.log('Sending notification...');
   if(ids.length) {
     const options = {
-      url: 'http://wordz-push-notification:3010/api/notifications',
+      url: 'http://lexio-push-notification:3010/api/notifications',
       headers: {
         Authorization: jwt
       },

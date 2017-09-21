@@ -36,8 +36,10 @@ startJob('en_GB')
   .then(() => {
     authenticationDb.close();
     gameDb.close();
+    console.log('Update Ranking Done !');
   })
   .catch(err => {
+    console.log('Update Ranking Error !');
     console.error(err);
     authenticationDb.close();
     gameDb.close();

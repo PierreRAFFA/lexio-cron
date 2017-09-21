@@ -1,4 +1,4 @@
-# Wordz Cron
+# Lexio Cron
 
 Cron used by WordZ repository (private) which is a project developed in Unity5 (c#)
 
@@ -12,19 +12,19 @@ Cron used by WordZ repository (private) which is a project developed in Unity5 (
 
 #### Build and push
 ```sh
-docker build -t pierreraffa/wordz-cron:latest .  
-docker push pierreraffa/wordz-cron:latest  
-docker pull pierreraffa/wordz-cron:latest  
+docker build -t pierreraffa/lexio-cron:latest .  
+docker push pierreraffa/lexio-cron:latest  
+docker pull pierreraffa/lexio-cron:latest  
 ```  
 #### Create containers
 ```sh
-docker run --name wordz-cron --link wordz-api-mongo:mongo -d pierreraffa/wordz-cron:latest  
+docker run --name lexio-cron --link lexio-api-mongo:mongo -d pierreraffa/lexio-cron:latest  
 ```  
 #### Connect to the containers:  
 ```sh
-docker exec -it wordz-cron /bin/bash  
+docker exec -it lexio-cron /bin/bash  
 ```
 #### Connect to the logs  
 ```sh
-docker logs wordz-cron -f  
+docker logs lexio-cron -f  
 ```

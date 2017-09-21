@@ -1,11 +1,11 @@
 {
-  "name": "wordz-cron",
+  "name": "LexioCron",
   "version": "0.2.2",
-  "description": "Wordz Cron",
+  "description": "Lexio Cron",
   "main": "start-cron.sh",
   "repository": {
     "type": "git",
-    "url": "git@github.com:PierreRAFFA/wordz-cron.git"
+    "url": "git@github.com:PierreRAFFA/lexio-cron.git"
   },
   "dependencies": {
     "assert": "^1.4.1",
@@ -18,7 +18,7 @@
   "author": "Pierre RAFFA",
   "license": "Apache 2.0",
   "bugs": {
-    "url": "https://github.com/PierreRAFFA/wordz-cron/issues"
+    "url": "https://github.com/PierreRAFFA/lexio-cron/issues"
   },
-  "homepage": "https://github.com/PierreRAFFA/wordz-cron"
+  "homepage": "https://github.com/PierreRAFFA/lexio-cron"
 }
