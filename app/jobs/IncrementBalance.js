@@ -43,8 +43,8 @@ function loginAsAdmin() {
       if (error) {
         reject(error);
       } else {
-        console.log(body);
-        resolve(JSON.parse(body));
+        console.log(response.body);
+        resolve(JSON.parse(response.body));
       }
     });
   });

@@ -3,3 +3,6 @@
 
 # Every hour
 0 * * * * . /root/env.sh; /usr/local/bin/node /var/app/app/jobs/incrementBalance.js >> /var/log/cron.log 2>&1
+
+# Every Monday at 00:00
+0 0 * * 1 . /root/env.sh; /usr/local/bin/node /var/app/app/jobs/closeCurrentRanking.js >> /var/log/cron.log 2>&1

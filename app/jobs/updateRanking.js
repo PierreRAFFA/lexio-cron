@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+/**
+ * Updates the ranking and updates the user.statistics.ranking
+ */
 console.log('updateRanking');
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
@@ -191,7 +194,9 @@ function getUsers(userIds) {
   if (!userIds || userIds.length === 0) {
     defer.resolve([]);
   } else {
-    // db.user.aggregate([{$match: { $or: [{"_id": ObjectId("59a45abd5a483602c777df40")}, {_id:ObjectId("59a409d4d31674002598833a")}] }},{"$lookup": {"from":"userIdentity","localField":"_id","foreignField":"userId","as":"test"}}])
+    // db.user.aggregate([{$match: { $or: [{"_id": ObjectId("59a45abd5a483602c777df40")},
+    // {_id:ObjectId("59a409d4d31674002598833a")}] }},
+    // {"$lookup": {"from":"userIdentity","localField":"_id","foreignField":"userId","as":"test"}}])
     const userCollection = authenticationDb.collection('user');
     userCollection.aggregate([{
       $match: {
@@ -218,7 +223,11 @@ function getUsers(userIds) {
 /////////////////////////////////////////////////////// SAVE
 /**
  * Saves the ranking in the database
- * @param ranking
+ * Creates a new one if currentRanking is null
+ *
+ * @param currentRanking May be null
+ * @param rankingContent
+ * @param language not used yet
  * @returns {Promise.<TResult>}
  */
 function saveRanking(currentRanking, rankingContent, language) {
@@ -263,7 +272,7 @@ function saveRanking(currentRanking, rankingContent, language) {
 }
 
 /**
- * Returns the current ranking
+ * Returns the current ranking (ranking still opened)
  * May return undefined if no ranking has been found at all
  * or no opened ranking has been found (ranking is expired because of the endDate)
  */
@@ -271,10 +280,10 @@ function getCurrentRanking() {
   const defer = Promise.defer();
   const rankingCollection = gameDb.collection('ranking');
 
-  rankingCollection.find({endDate: {$gt: new Date()}}).sort({endDate: -1}).limit(1).toArray((err, rankings) => {
+  rankingCollection.find({status: 'open'}).sort({endDate: -1}).limit(1).toArray((err, rankings) => {
     if(err) {
       defer.reject(err);
-    }else{
+    } else {
       defer.resolve(head(rankings));
     }
   });
@@ -293,17 +302,6 @@ function updateUserRanking(user, ranking, language) {
   if (user.statistics[language]) {
     console.log('set ranking to ' + ranking);
     user.statistics[language].ranking = ranking;
-
-    var highestRanking;
-    if (isNaN(user.statistics[language].highestRanking)) {
-      highestRanking = user.statistics[language].ranking;
-    } else {
-      highestRanking = Math.min(
-        user.statistics[language].highestRanking,
-        user.statistics[language].ranking
-      );
-    }
-    user.statistics[language].highestRanking = highestRanking;
 
     const userCollection = authenticationDb.collection('user');
     userCollection.save(user);
