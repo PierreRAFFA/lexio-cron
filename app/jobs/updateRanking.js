@@ -243,6 +243,7 @@ function saveRanking(currentRanking, rankingContent, language) {
         ranking: rankingContent,
         language: 'en_GB',
         startDate: new Date(),
+        status: 'open', // default is open
         endDate: new Date(moment()
           .day(RANKING_DAY_DURATION)
           .set('hour', 0)
