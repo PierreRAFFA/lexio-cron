@@ -2,7 +2,7 @@
 /**
  * Closes the ranking and then updates every user.statistics.highestRanking
  */
-console.log('updateRanking');
+console.log('closeCurrentRanking');
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 const assert = require('assert');
@@ -56,7 +56,7 @@ function startJob() {
   })
   .then(instance => {
     currentRanking = instance;
-    return closeRanking(currentRanking);
+    closeRanking(currentRanking);
   })
   .then(() => {
     return updateUsersRanking(currentRanking);
@@ -126,14 +126,10 @@ function getCurrentRanking() {
  * @param currentRanking
  */
 function closeRanking(currentRanking) {
-  const defer = Promise.defer();
-
   const rankingCollection = gameDb.collection('ranking');
 
   currentRanking.status = 'done';
   rankingCollection.save(currentRanking);
-
-  return defer.promise;
 }
 
 /////////////////////////////////////////////////////////////////
