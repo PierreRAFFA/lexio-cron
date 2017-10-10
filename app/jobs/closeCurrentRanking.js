@@ -59,7 +59,10 @@ function startJob() {
     closeRanking(currentRanking);
   })
   .then(() => {
-    return updateUsersRanking(currentRanking);
+    return resetUsersRanking();
+  })
+  .then(() => {
+    return updateUsersHighestRanking(currentRanking);
   })
 }
 /////////////////////////////////////////////////////////////////
@@ -134,7 +137,17 @@ function closeRanking(currentRanking) {
 
 /////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
-function updateUsersRanking(ranking) {
+function resetUsersRanking() {
+  const defer = Promise.defer();
+  const userCollection = authenticationDb.collection('user');
+  userCollection.updateMany({}, {$unset:{'statistics.en_GB.ranking': 1}}).then(function(err) {
+    defer.resolve();
+  });
+  return defer.promise;
+}
+/////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+function updateUsersHighestRanking(ranking) {
   const rankingUsers = ranking.ranking;
   console.dir(rankingUsers);
   const userIds = map(rankingUsers, rankingUser => rankingUser.user._id);
@@ -142,7 +155,7 @@ function updateUsersRanking(ranking) {
 
   return getUsers(userIds).then(instances => {
     forEach(instances, (instance, index) => {
-      updateUserRanking(instance, index + 1, 'en_GB')
+      updateUserHighestRanking(instance, index + 1, 'en_GB')
     });
   });
 }
@@ -154,7 +167,7 @@ function updateUsersRanking(ranking) {
  * @param ranking
  * @param language
  */
-function updateUserRanking(user, ranking, language) {
+function updateUserHighestRanking(user, ranking, language) {
   if (user.statistics[language]) {
     console.log('set ranking to ' + ranking);
 
