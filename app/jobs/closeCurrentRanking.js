@@ -17,7 +17,7 @@ const omit = require('lodash/omit');
 const get = require('lodash/get');
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-const LANGUAGES = ['en_GB', 'fr_FR'];
+const LANGUAGES = ['en', 'fr_FR'];
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 // Connection URL
@@ -140,7 +140,7 @@ function closeRanking(currentRanking) {
 function resetUsersRanking() {
   const defer = Promise.defer();
   const userCollection = authenticationDb.collection('user');
-  userCollection.updateMany({}, {$unset:{'statistics.en_GB.ranking': 1}}).then(function(err) {
+  userCollection.updateMany({}, {$unset:{'statistics.en.ranking': 1}}).then(function(err) {
     defer.resolve();
   });
   return defer.promise;
@@ -155,7 +155,7 @@ function updateUsersHighestRanking(ranking) {
 
   return getUsers(userIds).then(instances => {
     forEach(instances, (instance, index) => {
-      updateUserHighestRanking(instance, index + 1, 'en_GB')
+      updateUserHighestRanking(instance, index + 1, 'en')
     });
   });
 }

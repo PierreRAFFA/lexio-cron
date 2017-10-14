@@ -18,7 +18,7 @@ const omit = require('lodash/omit');
 const get = require('lodash/get');
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
-const LANGUAGES = ['en_GB', 'fr_FR'];
+const LANGUAGES = ['en', 'fr_FR'];
 const RANKING_DAY_DURATION = 8;  //next Monday(1) + 7
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ console.log('===================');
 let authenticationDb;
 let gameDb;
 
-startJob('en_GB')
+startJob('en')
   .then(() => {
     authenticationDb.close();
     gameDb.close();
@@ -241,7 +241,7 @@ function saveRanking(currentRanking, rankingContent, language) {
     if(!currentRanking) {
       rankingCollection.insertOne({
         ranking: rankingContent,
-        language: 'en_GB',
+        language: 'en',
         startDate: new Date(),
         status: 'open', // default is open
         endDate: new Date(moment()
