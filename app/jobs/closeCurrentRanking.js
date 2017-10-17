@@ -59,10 +59,10 @@ function startJob() {
     closeRanking(currentRanking);
   })
   .then(() => {
-    return resetUsersRanking();
+    return updateUsersHighestRanking(currentRanking);
   })
   .then(() => {
-    return updateUsersHighestRanking(currentRanking);
+    return resetUsersRanking();
   })
 }
 /////////////////////////////////////////////////////////////////
