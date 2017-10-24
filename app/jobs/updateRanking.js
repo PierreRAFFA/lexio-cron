@@ -26,10 +26,6 @@ const RANKING_DAY_DURATION = 8;  //next Monday(1) + 7
 const authenticationMongo = require('../config')(process.env.NODE_ENV).authentication;
 const gameMongo = require('../config')(process.env.NODE_ENV).game;
 
-console.log('===================');
-console.log(authenticationMongo);
-console.log(gameMongo);
-console.log('===================');
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 let authenticationDb;
@@ -163,7 +159,6 @@ function populateUserInAggregateGames(aggregateGames, language) {
   const userIds = map(aggregateGames, game => {
     return game._id;
   });
-  console.log(userIds);
   return getUsers(userIds).then(users => {
     return map(aggregateGames, (aggregateGame, index) => {
       //set the game user
@@ -233,8 +228,6 @@ function getUsers(userIds) {
 function saveRanking(currentRanking, rankingContent, language) {
   const defer = Promise.defer();
 
-  // return getCurrentRanking().then(currentRanking => {
-  //   console.log(currentRanking);
     const rankingCollection = gameDb.collection('ranking');
 
     //means no ranking saved yet or no ranking for the current date
@@ -301,7 +294,6 @@ function getCurrentRanking() {
  */
 function updateUserRanking(user, ranking, language) {
   if (user.statistics[language]) {
-    console.log('set ranking to ' + ranking);
     user.statistics[language].ranking = ranking;
 
     const userCollection = authenticationDb.collection('user');

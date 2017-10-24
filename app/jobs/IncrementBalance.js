@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 console.log('incrementBalance');
-console.log(process.env.NODE_ENV);
-console.log(process.env.AUTHENTICATION_API_ADMIN_PASSWORD);
 ///////////////////////////////////////////////////////////////////////////
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
@@ -43,7 +41,6 @@ function loginAsAdmin() {
       if (error) {
         reject(error);
       } else {
-        console.log(response.body);
         resolve(JSON.parse(response.body));
       }
     });
@@ -56,9 +53,6 @@ function incrementBalance(jwt) {
 
   // Connection URL
   const url = require('../config')(process.env.NODE_ENV).authentication;
-  console.log('===================');
-  console.log(url);
-  console.log('===================');
 
   MongoClient.connect(url, (err, db) => {
     assert.equal(null, err);
@@ -98,7 +92,6 @@ function incrementBalance(jwt) {
  * @param ids user firebaseToken list
  */
 function sendNotification(jwt, type, ids) {
-  console.log('Sending notification...');
   if(ids.length) {
     const options = {
       url: 'http://lexio-push-notification:3010/api/notifications',

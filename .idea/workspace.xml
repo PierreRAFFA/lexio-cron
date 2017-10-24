@@ -4,6 +4,7 @@
     <list default="true" id="152e38bf-53cd-46f3-81ad-afc9874a66af" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/jobs/closeCurrentRanking.js" afterPath="$PROJECT_DIR$/app/jobs/closeCurrentRanking.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/jobs/updateRanking.js" afterPath="$PROJECT_DIR$/app/jobs/updateRanking.js" />
     </list>
     <ignored path="wordz-cron.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -49,8 +50,8 @@
       <file leaf-file-name="incrementBalance.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/jobs/incrementBalance.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
-              <caret line="14" column="32" lean-forward="true" selection-start-line="14" selection-start-column="32" selection-end-line="14" selection-end-column="32" />
+            <state relative-caret-position="261">
+              <caret line="91" column="37" lean-forward="true" selection-start-line="91" selection-start-column="37" selection-end-line="91" selection-end-column="37" />
               <folding />
             </state>
           </provider>
@@ -59,8 +60,8 @@
       <file leaf-file-name="updateRanking.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/jobs/updateRanking.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="377">
-              <caret line="291" column="1" lean-forward="true" selection-start-line="291" selection-start-column="1" selection-end-line="291" selection-end-column="1" />
+            <state relative-caret-position="277">
+              <caret line="171" column="57" lean-forward="true" selection-start-line="171" selection-start-column="57" selection-end-line="171" selection-end-column="57" />
               <folding />
             </state>
           </provider>
@@ -69,8 +70,8 @@
       <file leaf-file-name="closeCurrentRanking.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/jobs/closeCurrentRanking.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="327">
-              <caret line="184" column="63" lean-forward="true" selection-start-line="184" selection-start-column="63" selection-end-line="184" selection-end-column="63" />
+            <state relative-caret-position="693">
+              <caret line="168" column="0" lean-forward="true" selection-start-line="168" selection-start-column="0" selection-end-line="168" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -117,9 +118,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>and</find>
-      <find>$or</find>
-      <find>ids</find>
       <find>w</find>
       <find>wo</find>
       <find>wor</find>
@@ -131,8 +129,6 @@
       <find>populateUserInAggregateGames</find>
       <find>Increment Balance Done !</find>
       <find>updateUserRanking</find>
-      <find>console.log</find>
-      <find>getCurrentRanking</find>
       <find>colour</find>
       <find>color</find>
       <find>updateMany</find>
@@ -147,6 +143,11 @@
       <find>.j</find>
       <find>.jw</find>
       <find>.jwt</find>
+      <find>getCurrentRanking</find>
+      <find>console.log</find>
+      <find>sendNotification</find>
+      <find>console</find>
+      <find>access_token</find>
     </findStrings>
     <replaceStrings>
       <replace>/var/app</replace>
@@ -177,11 +178,11 @@
         <option value="$PROJECT_DIR$/node_modules/promise-series-advanced/package.json" />
         <option value="$PROJECT_DIR$/app/jobs/incrementBalanceTest.js" />
         <option value="$PROJECT_DIR$/app/config.js" />
-        <option value="$PROJECT_DIR$/app/jobs/incrementBalance.js" />
         <option value="$PROJECT_DIR$/app/crontab" />
         <option value="$PROJECT_DIR$/Dockerfile" />
-        <option value="$PROJECT_DIR$/app/jobs/updateRanking.js" />
         <option value="$PROJECT_DIR$/../lexio-native/Assets/Wordz/Resources/Dictionaries/en_GB.txt" />
+        <option value="$PROJECT_DIR$/app/jobs/updateRanking.js" />
+        <option value="$PROJECT_DIR$/app/jobs/incrementBalance.js" />
         <option value="$PROJECT_DIR$/app/jobs/closeCurrentRanking.js" />
       </list>
     </option>
@@ -430,12 +431,12 @@
       <workItem from="1505242704411" duration="9484000" />
       <workItem from="1505933372187" duration="19333000" />
       <workItem from="1507487051080" duration="6107000" />
-      <workItem from="1507979719037" duration="7176000" />
+      <workItem from="1507979719037" duration="17947000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="173106000" />
+    <option name="totallyTimeSpent" value="183877000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="840" extended-state="6" />
@@ -450,7 +451,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23395722" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4879679" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4893048" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -841,14 +842,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/jobs/incrementBalance.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="14" column="32" lean-forward="true" selection-start-line="14" selection-start-column="32" selection-end-line="14" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/crontab">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -857,18 +850,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/jobs/incrementBalance.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="261">
+          <caret line="91" column="37" lean-forward="true" selection-start-line="91" selection-start-column="37" selection-end-line="91" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/jobs/updateRanking.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="377">
-          <caret line="291" column="1" lean-forward="true" selection-start-line="291" selection-start-column="1" selection-end-line="291" selection-end-column="1" />
+        <state relative-caret-position="277">
+          <caret line="171" column="57" lean-forward="true" selection-start-line="171" selection-start-column="57" selection-end-line="171" selection-end-column="57" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/jobs/closeCurrentRanking.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="327">
-          <caret line="184" column="63" lean-forward="true" selection-start-line="184" selection-start-column="63" selection-end-line="184" selection-end-column="63" />
+        <state relative-caret-position="693">
+          <caret line="168" column="0" lean-forward="true" selection-start-line="168" selection-start-column="0" selection-end-line="168" selection-end-column="0" />
           <folding />
         </state>
       </provider>

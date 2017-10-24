@@ -15,6 +15,7 @@ const filter = require('lodash/filter');
 const head = require('lodash/head');
 const omit = require('lodash/omit');
 const get = require('lodash/get');
+const pull = require('lodash/pull');
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 const LANGUAGES = ['en', 'fr_FR'];
@@ -24,10 +25,6 @@ const LANGUAGES = ['en', 'fr_FR'];
 const authenticationMongo = require('../config')(process.env.NODE_ENV).authentication;
 const gameMongo = require('../config')(process.env.NODE_ENV).game;
 
-console.log('===================');
-console.log(authenticationMongo);
-console.log(gameMongo);
-console.log('===================');
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 let authenticationDb;
@@ -149,9 +146,9 @@ function resetUsersRanking() {
 ///////////////////////////////////////////////////////
 function updateUsersHighestRanking(ranking) {
   const rankingUsers = ranking.ranking;
-  console.dir(rankingUsers);
-  const userIds = map(rankingUsers, rankingUser => rankingUser.user._id);
-  console.log(userIds);
+
+  let userIds = map(rankingUsers, rankingUser => get(rankingUser, 'user._id'));
+  userIds = pull(userIds, undefined);
 
   return getUsers(userIds).then(instances => {
     forEach(instances, (instance, index) => {
@@ -169,7 +166,6 @@ function updateUsersHighestRanking(ranking) {
  */
 function updateUserHighestRanking(user, ranking, language) {
   if (user.statistics[language]) {
-    console.log('set ranking to ' + ranking);
 
     var highestRanking;
     if (isNaN(user.statistics[language].highestRanking)) {
