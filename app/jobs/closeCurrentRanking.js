@@ -53,7 +53,7 @@ function startJob() {
   })
   .then(instance => {
     currentRanking = instance;
-    closeRanking(currentRanking);
+    return closeRanking(currentRanking);
   })
   .then(() => {
     return updateUsersHighestRanking(currentRanking);
@@ -126,6 +126,7 @@ function getCurrentRanking() {
  * @param currentRanking
  */
 function closeRanking(currentRanking) {
+  console.log('closeRanking');
   const rankingCollection = gameDb.collection('ranking');
 
   currentRanking.status = 'done';
@@ -135,6 +136,7 @@ function closeRanking(currentRanking) {
 /////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
 function resetUsersRanking() {
+  console.log('resetUsersRanking');
   const defer = Promise.defer();
   const userCollection = authenticationDb.collection('user');
   userCollection.updateMany({}, {$unset:{'statistics.en.ranking': 1}}).then(function(err) {
@@ -145,14 +147,22 @@ function resetUsersRanking() {
 /////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
 function updateUsersHighestRanking(ranking) {
+  console.log('updateUsersHighestRanking');
   const rankingUsers = ranking.ranking;
 
-  let userIds = map(rankingUsers, rankingUser => get(rankingUser, 'user._id'));
-  userIds = pull(userIds, undefined);
+  console.log('rankingUsers');
+  console.log(rankingUsers);
 
-  return getUsers(userIds).then(instances => {
-    forEach(instances, (instance, index) => {
-      updateUserHighestRanking(instance, index + 1, 'en')
+  let userObjectIds = map(rankingUsers, rankingUser => get(rankingUser, 'user._id'));
+  console.log(userObjectIds);
+  userObjectIds = pull(userObjectIds, undefined);
+  console.log(userObjectIds);
+
+  return getUsers(userObjectIds).then(instances => {
+    console.log('instances');
+    console.log(instances);
+    forEach(instances, instance => {
+      updateUserHighestRanking(instance, 'en')
     });
   });
 }
@@ -164,7 +174,8 @@ function updateUsersHighestRanking(ranking) {
  * @param ranking
  * @param language
  */
-function updateUserHighestRanking(user, ranking, language) {
+function updateUserHighestRanking(user, language) {
+  console.log('updateUserHighestRanking');
   if (user.statistics[language]) {
 
     var highestRanking;
@@ -177,7 +188,7 @@ function updateUserHighestRanking(user, ranking, language) {
       );
     }
     user.statistics[language].highestRanking = highestRanking;
-
+    console.log('updated to:' + highestRanking);
     const userCollection = authenticationDb.collection('user');
     userCollection.save(user);
   }
@@ -187,12 +198,12 @@ function updateUserHighestRanking(user, ranking, language) {
 ///////////////////////////////////////////////////////  UPDATE USERS
 /**
  * Returns the user list
- * @param userIds
+ * @param userObjectIds
  */
-function getUsers(userIds) {
+function getUsers(userObjectIds) {
   const defer = Promise.defer();
 
-  if (!userIds || userIds.length === 0) {
+  if (!userObjectIds || userObjectIds.length === 0) {
     defer.resolve([]);
   } else {
     // db.user.aggregate([{$match: { $or: [{"_id": ObjectId("59a45abd5a483602c777df40")},
@@ -201,7 +212,7 @@ function getUsers(userIds) {
     const userCollection = authenticationDb.collection('user');
     userCollection.aggregate([{
       $match: {
-        $or: map(userIds, id => ({ _id: new ObjectID(id) }))
+        $or: map(userObjectIds, userObjectId => ({ _id: new ObjectID(userObjectId) }))
       }
     }, {
       $lookup: {
