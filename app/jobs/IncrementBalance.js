@@ -94,7 +94,7 @@ function incrementBalance(jwt) {
 function sendNotification(jwt, type, ids) {
   if(ids.length) {
     const options = {
-      url: 'http://lexio-push-notification:3010/api/notifications',
+      url: 'http://lexio-notification:3010/api/notifications',
       headers: {
         Authorization: jwt
       },
