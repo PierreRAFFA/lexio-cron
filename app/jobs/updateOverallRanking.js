@@ -148,7 +148,7 @@ function populateUserInAggregateGames(aggregateGames, language) {
       if(gameUser) {
         aggregateGame.user = JSON.parse(JSON.stringify(
           omit(gameUser, [
-            'password', 'accessToken', 'email', 'statistics', 'balance', 'firebaseToken',
+            'password', 'accessToken', 'email', 'balance', 'firebaseToken',
           ])
         ));
         updateUserOverallRanking(gameUser, index + 1, language);
