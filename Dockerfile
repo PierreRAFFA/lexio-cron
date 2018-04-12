@@ -1,4 +1,4 @@
-FROM node:boron
+FROM node:carbon
 
 ARG nodeEnv
 ARG mongoApiPassword

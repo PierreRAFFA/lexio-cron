@@ -1,6 +1,9 @@
 # Every minute
-*/1 * * * * . /root/env.sh; /usr/local/bin/node /var/app/app/jobs/updateRanking.js >> /var/log/cron.log 2>&1
-*/1 * * * * . /root/env.sh; /usr/local/bin/node /var/app/app/jobs/updateOverallRanking.js >> /var/log/cron.log 2>&1
+*/1 * * * * . /root/env.sh; /usr/local/bin/node /var/app/app/jobs/updateRanking.js --language=en >> /var/log/cron.log 2>&1
+*/1 * * * * . /root/env.sh; /usr/local/bin/node /var/app/app/jobs/updateOverallRanking.js --language=en >> /var/log/cron.log 2>&1
+
+*/1 * * * * . /root/env.sh; /usr/local/bin/node /var/app/app/jobs/updateRanking.js --language=fr >> /var/log/cron.log 2>&1
+*/1 * * * * . /root/env.sh; /usr/local/bin/node /var/app/app/jobs/updateOverallRanking.js --language=fr >> /var/log/cron.log 2>&1
 
 # Every hour
 0 * * * * . /root/env.sh; /usr/local/bin/node /var/app/app/jobs/incrementBalance.js >> /var/log/cron.log 2>&1

@@ -13,7 +13,8 @@
     "moment": "^2.18.1",
     "mongodb": "^2.2.26",
     "promise-series-advanced": "^1.1.1",
-    "request": "^2.81.0"
+    "request": "^2.81.0",
+    "yargs": "^11.0.0"
   },
   "author": "Pierre RAFFA",
   "license": "Apache 2.0",
