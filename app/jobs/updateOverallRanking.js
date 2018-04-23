@@ -270,7 +270,7 @@ function saveRanking(rankingContent, language) {
  */
 function updateUserOverallRanking(user, ranking, language) {
   if (user.statistics[language]) {
-    user.statistics[language].overallrRanking = ranking;
+    user.statistics[language].overallRanking = ranking;
 
     const userCollection = authenticationDb.collection('user');
     userCollection.save(user);

@@ -16,9 +16,11 @@ const head = require('lodash/head');
 const omit = require('lodash/omit');
 const get = require('lodash/get');
 const pull = require('lodash/pull');
-///////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////
-const LANGUAGES = ['en', 'fr_FR'];
+
+const argv = require('yargs').argv;
+const LANGUAGE = argv.language;
+
+console.log(`closeCurrentRanking ${LANGUAGE}`);
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 // Connection URL
@@ -30,7 +32,7 @@ const gameMongo = require('../config')(process.env.NODE_ENV).game;
 let authenticationDb;
 let gameDb;
 
-startJob()
+startJob(LANGUAGE)
 .then(() => {
   authenticationDb.close();
   gameDb.close();
@@ -45,21 +47,21 @@ startJob()
 
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////// START
-function startJob() {
+function startJob(language) {
   let currentRanking;
   return connectToDatabases()
   .then(() => {
-    return getCurrentRanking();
+    return getCurrentRanking(language);
   })
   .then(instance => {
     currentRanking = instance;
     return closeRanking(currentRanking);
   })
   .then(() => {
-    return updateUsersHighestRanking(currentRanking);
+    return updateUsersHighestRanking(currentRanking, language);
   })
   .then(() => {
-    return resetUsersRanking();
+    return resetUsersRanking(language);
   })
 }
 /////////////////////////////////////////////////////////////////
@@ -85,19 +87,16 @@ function connectToDatabases() {
 }
 
 function connectToDatabase(url) {
-  const defer = Promise.defer();
-
-  MongoClient.connect(url , (err, db) => {
-    assert.equal(null, err);
-
-    if (err) {
-      defer.reject(err);
-    }else{
-      defer.resolve(db);
-    }
+  return new Promise((resolve, reject) => {
+    MongoClient.connect(url , (err, db) => {
+      assert.equal(null, err);
+      if (err) {
+        reject(err);
+      }else{
+        resolve(db);
+      }
+    });
   });
-
-  return defer.promise;
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////// RANKING
@@ -106,18 +105,18 @@ function connectToDatabase(url) {
  * May return undefined if no ranking has been found at all
  * or no opened ranking has been found (ranking is expired because of the endDate)
  */
-function getCurrentRanking() {
-  const defer = Promise.defer();
-  const rankingCollection = gameDb.collection('ranking');
+function getCurrentRanking(language) {
+  return new Promise((resolve, reject) => {
+    const rankingCollection = gameDb.collection('ranking');
 
-  rankingCollection.find({status: 'open'}).toArray((err, rankings) => {
-    if(err) {
-      defer.reject(err);
-    }else{
-      defer.resolve(head(rankings));
-    }
+    rankingCollection.find({ status: 'open', language: language }).toArray((err, rankings) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(head(rankings));
+      }
+    });
   });
-  return defer.promise;
 }
 
 /**
@@ -135,18 +134,19 @@ function closeRanking(currentRanking) {
 
 /////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
-function resetUsersRanking() {
+function resetUsersRanking(language) {
   console.log('resetUsersRanking');
-  const defer = Promise.defer();
-  const userCollection = authenticationDb.collection('user');
-  userCollection.updateMany({}, {$unset:{'statistics.en.ranking': 1}}).then(function(err) {
-    defer.resolve();
+  console.log(language);
+  return new Promise((resolve, reject) => {
+    const userCollection = authenticationDb.collection('user');
+    userCollection.updateMany({}, { $unset: { [`statistics.${language}.ranking`]: 1 } }).then(function (err) {
+      resolve();
+    });
   });
-  return defer.promise;
 }
 /////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////
-function updateUsersHighestRanking(ranking) {
+function updateUsersHighestRanking(ranking, language) {
   console.log('updateUsersHighestRanking');
   const rankingUsers = ranking.ranking;
 
@@ -162,7 +162,7 @@ function updateUsersHighestRanking(ranking) {
     console.log('instances');
     console.log(instances);
     forEach(instances, instance => {
-      updateUserHighestRanking(instance, 'en')
+      updateUserHighestRanking(instance, language)
     });
   });
 }
@@ -201,34 +201,34 @@ function updateUserHighestRanking(user, language) {
  * @param userObjectIds
  */
 function getUsers(userObjectIds) {
-  const defer = Promise.defer();
+  return new Promise((resolve, reject) => {
 
-  if (!userObjectIds || userObjectIds.length === 0) {
-    defer.resolve([]);
-  } else {
-    // db.user.aggregate([{$match: { $or: [{"_id": ObjectId("59a45abd5a483602c777df40")},
-    // {_id:ObjectId("59a409d4d31674002598833a")}] }},
-    // {"$lookup": {"from":"userIdentity","localField":"_id","foreignField":"userId","as":"test"}}])
-    const userCollection = authenticationDb.collection('user');
-    userCollection.aggregate([{
-      $match: {
-        $or: map(userObjectIds, userObjectId => ({ _id: new ObjectID(userObjectId) }))
-      }
-    }, {
-      $lookup: {
-        from: 'userIdentity',
-        localField: '_id',
-        foreignField: 'userId',
-        as: 'identities'
-      }
-    }], (err, users) => {
-      if (err) {
-        defer.reject(err);
-      } else {
-        defer.resolve(users);
-      }
-    });
-  }
-  return defer.promise;
+    if (!userObjectIds || userObjectIds.length === 0) {
+      resolve([]);
+    } else {
+      // db.user.aggregate([{$match: { $or: [{"_id": ObjectId("59a45abd5a483602c777df40")},
+      // {_id:ObjectId("59a409d4d31674002598833a")}] }},
+      // {"$lookup": {"from":"userIdentity","localField":"_id","foreignField":"userId","as":"test"}}])
+      const userCollection = authenticationDb.collection('user');
+      userCollection.aggregate([{
+        $match: {
+          $or: map(userObjectIds, userObjectId => ({ _id: new ObjectID(userObjectId) }))
+        }
+      }, {
+        $lookup: {
+          from: 'userIdentity',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'identities'
+        }
+      }], (err, users) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(users);
+        }
+      });
+    }
+  });
 }
 
