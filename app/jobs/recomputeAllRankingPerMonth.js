@@ -2,8 +2,6 @@
 /**
  * Updates the ranking and updates the user.statistics.ranking
  */
-
-console.log('overall');
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 const assert = require('assert');
@@ -20,7 +18,8 @@ const get = require('lodash/get');
 const argv = require('yargs').argv;
 const LANGUAGE = argv.language;
 
-console.log(`updateOverallRanking ${LANGUAGE}`);
+console.log(`updateRanking ${LANGUAGE}`);
+
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 const RANKING_DAY_DURATION = 8;  //next Monday(1) + 7
@@ -35,31 +34,53 @@ const gameMongo = require('../config')(process.env.NODE_ENV).game;
 let authenticationDb;
 let gameDb;
 
-startJob(LANGUAGE)
-  .then(() => {
+(async () => {
+  try {
+    await startJob(LANGUAGE);
+
     authenticationDb.close();
     gameDb.close();
-    console.log(`updateOverallRanking ${LANGUAGE} Done !`);
-  })
-  .catch(err => {
-    console.log(`updateOverallRanking ${LANGUAGE} Error !`);
-    console.error(err);
+    console.log(`updateRanking ${LANGUAGE} Done !`);
+  }catch (e) {
+    console.log(`updateRanking ${LANGUAGE} Error !`);
+    console.error(e);
     authenticationDb.close();
     gameDb.close();
-  });
+  }
+})();
+
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////// START
-function startJob(language) {
-  return connectToDatabases()
-    .then(() => {
-      return aggregateGames(language);
-    })
-    .then(aggregateGames => {
-      return populateUserInAggregateGames(aggregateGames, language);
-    })
-    .then(rankingContent => {
-      return saveRanking(rankingContent, language);
-    })
+async function startJob(language) {
+  await connectToDatabases();
+
+  const totalMonths = 10;
+
+  const month = moment().month() + 1;
+  const year = moment().year();
+
+  console.log('before loop');
+  for(var i = totalMonths; i >= 0; i--) {
+    const currentMonth = moment(`${year}-${month}`, "YYYY-MM").subtract(i, 'months');
+
+    const startDate = new Date(currentMonth);
+    const endDate = new Date(currentMonth.endOf('month'));
+    const reference = `${currentMonth.year()}-${currentMonth.month() + 1}`;
+    const status = i === 0 ? 'open' : 'done';
+    console.log('COMPUTING RANKING for', startDate, endDate);
+    console.log('status', status);
+    console.log('reference', reference);
+
+    //compute ranking
+    const aggregateGames = await computeRankingForMonth(language, startDate, endDate);
+    const ranking = await populateUserInAggregateGames(aggregateGames, language);
+
+    //save ranking
+    await saveRanking(ranking, language, startDate, endDate, status, reference);
+
+    console.log(ranking);
+    console.log("============");
+  }
 }
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////// DATABASE CONNECTION
@@ -97,24 +118,27 @@ function connectToDatabase(url) {
 }
 
 /////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////// GET RANKING FROM GAMES
-/**
- * Returns the sorted games by score with userId
- */
-function aggregateGames(language) {
+///////////////////////////////////////////////////////
+async function computeRankingForMonth(language, startDate, endDate) {
+
+  console.log(startDate)
+  console.log(endDate)
+  const gameCollection = gameDb.collection('game');
+
   return new Promise((resolve, reject) => {
-    const gameCollection = gameDb.collection('game');
+
     gameCollection.aggregate([{
       $match: {
         $and: [
           { language: language },
+          { creationDate: { $gt: startDate, $lt: endDate } },
         ]
       }
     }, {
       $group: {
         _id: "$userId",
         score: { $max: "$score" },
-        userId: { $first: "$userId" }
+        userId: { $first: "$userId"}
       }
     }, {
       $sort: { score: -1 }
@@ -127,6 +151,7 @@ function aggregateGames(language) {
     });
   });
 }
+
 
 /**
  * Populates user field in the aggregateGames and updates the user ranking
@@ -141,7 +166,7 @@ function populateUserInAggregateGames(aggregateGames, language) {
       return game._id;
     });
     return getUsers(userIds).then(users => {
-      let games =  map(aggregateGames, (aggregateGame, index) => {
+      const populated = map(aggregateGames, (aggregateGame, index) => {
         //set the game user
         const gameUser = head(filter(users, user => user._id.toString() === aggregateGame.userId));
         if(gameUser) {
@@ -150,17 +175,15 @@ function populateUserInAggregateGames(aggregateGames, language) {
               'password', 'accessToken', 'email', 'balance', 'firebaseToken',
             ])
           ));
-          updateUserOverallRanking(gameUser, index + 1, language);
         }
         delete aggregateGame.userId;
         return aggregateGame;
       });
-
-      games = filter(games, game => 'user' in game);
-      resolve(games);
+      resolve(populated);
     });
   });
 }
+
 
 /**
  * Returns the user list
@@ -172,9 +195,6 @@ function getUsers(userIds) {
     if (!userIds || userIds.length === 0) {
       resolve([]);
     } else {
-      // db.user.aggregate([{$match: { $or: [{"_id": ObjectId("59a45abd5a483602c777df40")},
-      // {_id:ObjectId("59a409d4d31674002598833a")}] }},
-      // {"$lookup": {"from":"userIdentity","localField":"_id","foreignField":"userId","as":"test"}}])
       const userCollection = authenticationDb.collection('user');
       userCollection.aggregate([{
         $match: {
@@ -198,25 +218,6 @@ function getUsers(userIds) {
   });
 }
 
-
-/**
- * Returns the current ranking (ranking still opened)
- * May return undefined if no ranking has been found at all
- * or no opened ranking has been found (ranking is expired because of the endDate)
- */
-function getCurrentRanking(language) {
-  return new Promise((resolve, reject) => {
-    const rankingCollection = gameDb.collection('ranking');
-
-    rankingCollection.find({status: 'overall', language: language}).limit(1).toArray((err, rankings) => {
-      if(err) {
-        reject(err);
-      } else {
-        resolve(head(rankings));
-      }
-    });
-  });
-}
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////// SAVE
 /**
@@ -228,52 +229,24 @@ function getCurrentRanking(language) {
  * @param language not used yet
  * @returns {Promise.<TResult>}
  */
-function saveRanking(rankingContent, language) {
+function saveRanking(rankingContent, language, startDate, endDate, status, reference) {
   return new Promise((resolve, reject) => {
 
     const rankingCollection = gameDb.collection('ranking');
 
-    return getCurrentRanking(language).then(currentRanking => {
-      if (!currentRanking) {
-        //means no ranking saved yet or no ranking for the current date
-        rankingCollection.insertOne({
-          ranking: rankingContent,
-          language: language,
-          status: 'overall', // default is open
-        }, (err, result) => {
-          if(err) {
-            reject(err);
-          }else{
-            resolve(rankingContent);
-          }
-        });
+    rankingCollection.updateOne({reference}, { $set: {
+      ranking: rankingContent,
+      reference,
+      language,
+      status,
+      startDate,
+      endDate
+    }}, {upsert: true}, (err, result) => {
+      if(err) {
+        reject(err);
       }else{
-        rankingCollection.updateOne({_id: currentRanking._id}, { $set: { ranking: rankingContent }}, (err, result) => {
-          if(err) {
-            reject(err);
-          }else{
-            resolve(rankingContent);
-          }
-        });
+        resolve(rankingContent);
       }
     });
   });
-}
-
-/////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////  UPDATE USERS
-/**
- * Updates the user statistics
- *
- * @param user
- * @param ranking
- * @param language
- */
-function updateUserOverallRanking(user, ranking, language) {
-  if (user.statistics[language]) {
-    user.statistics[language].overallRanking = ranking;
-
-    const userCollection = authenticationDb.collection('user');
-    userCollection.save(user);
-  }
 }
